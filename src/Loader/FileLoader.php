@@ -27,6 +27,14 @@ final class FileLoader implements LoaderInterface
      */
     public function load($path)
     {
+        $path = 'file://'.$path;
+        
+        // Replace blackslashes
+        $path = str_replace('\\', '/', $path);
+            
+        // Fix Windows Path (file://C:/abc --> file:///C:/abc)
+        $path = preg_replace("/^(file:\/\/)(\w:)/", "$1/$2", $path);
+            
         if (!file_exists($path)) {
             throw SchemaLoadingException::notFound($path);
         }

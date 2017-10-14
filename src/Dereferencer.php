@@ -81,6 +81,13 @@ final class Dereferencer implements DereferencerInterface
     {
         if (is_string($schema)) {
             $uri    = $schema;
+            
+            // Replace blackslashes
+            $uri    = str_replace('\\', '/', $uri);
+
+            // Fix Windows Path (file://C:/abc --> file:///C:/abc)
+            $uri    = preg_replace("/^(file:\/\/)(\w:)/", "$1/$2", $uri);
+            
             $schema = resolve_fragment($uri, $this->loadExternalRef($uri));
             $uri    = strip_fragment($uri);
         }
