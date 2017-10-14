@@ -1,5 +1,5 @@
 {
-    "name": "league/json-reference",
+    "name": "peterpostmann/json-reference",
     "type": "library",
     "description": "A library for working with JSON References",
     "keywords": [
