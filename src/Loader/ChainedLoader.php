@@ -8,7 +8,7 @@ use League\JsonReference\SchemaLoadingException;
 /**
  * This loader takes two other loaders as constructor parameters, and will
  * attempt to load from the first loader before deferring to the second loader.
- * This is useful when you would like to use multiple loaders for the same prefix.
+ * This is useful when you would like to use multiple loaders for the same protocol.
  */
 final class ChainedLoader implements LoaderInterface
 {
@@ -35,12 +35,12 @@ final class ChainedLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function load($path)
+    public function load($uri)
     {
         try {
-            return $this->firstLoader->load($path);
+            return $this->firstLoader->load($uri);
         } catch (SchemaLoadingException $e) {
-            return $this->secondLoader->load($path);
+            return $this->secondLoader->load($uri);
         }
     }
 }

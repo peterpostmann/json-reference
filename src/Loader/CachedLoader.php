@@ -30,16 +30,16 @@ final class CachedLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function load($path)
+    public function load($uri)
     {
-        $key   = sha1($path);
+        $key   = sha1($uri);
         $value = $this->cache->get($key);
 
         if ($value !== null) {
             return $value;
         }
 
-        $this->cache->set($key, $value = $this->loader->load($path));
+        $this->cache->set($key, $value = $this->loader->load($uri));
 
         return $value;
     }

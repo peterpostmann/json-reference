@@ -2,38 +2,37 @@
 
 namespace League\JsonReference\Loader;
 
-use League\JsonReference\JsonDecoder\JsonDecoder;
-use League\JsonReference\JsonDecoderInterface;
+use League\JsonReference\DecoderManager;
+use League\JsonReference\DecoderInterface;
 use League\JsonReference\LoaderInterface;
 use League\JsonReference\SchemaLoadingException;
 
 final class FileGetContentsLoader implements LoaderInterface
 {
     /**
-     * @var string
+     * @var DecoderManager
      */
-    private $prefix;
+    private $decoders;
 
     /**
-     * @var JsonDecoderInterface
+     * @param JsonDecoderInterface|DecoderManager $decoders
      */
-    private $jsonDecoder;
-
-    /**
-     * @param string               $prefix
-     * @param JsonDecoderInterface $jsonDecoder
-     */
-    public function __construct($prefix, JsonDecoderInterface $jsonDecoder = null)
+    public function __construct($decoders = null)
     {
-        $this->prefix      = $prefix;
-        $this->jsonDecoder = $jsonDecoder ?: new JsonDecoder();
+        if ($decoders instanceof DecoderInterface) {
+            $this->decoders = new DecoderManager([$decoders]);
+        } else {
+            $this->decoders = $decoders ?: new DecoderManager();
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function load($uri)
+    public function load($uri, $defaultExtension = 'json')
     {
+        $extension = isset(pathinfo($uri)['extension']) ? pathinfo($uri)['extension'] : $defaultExtension;
+
         set_error_handler(function () use ($uri) {
             throw SchemaLoadingException::create($uri);
         });
@@ -44,6 +43,6 @@ final class FileGetContentsLoader implements LoaderInterface
             throw SchemaLoadingException::create($uri);
         }
 
-        return $this->jsonDecoder->decode($response);
+        return $this->decoders->getDecoder($extension)->decode($response);
     }
 }

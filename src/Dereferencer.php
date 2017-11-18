@@ -92,7 +92,7 @@ final class Dereferencer implements DereferencerInterface
             // Fix Windows Path (file://C:/abc --> file:///C:/abc)
             $uri    = preg_replace("/^(file:\/\/)(\w:)/", "$1/$2", $uri);
             
-            $schema = resolve_fragment($uri, $this->loadExternalRef($uri));
+            $schema = resolve_fragment($uri, $this->loadRef($uri));
             $uri    = strip_fragment($uri);
         }
 
@@ -186,9 +186,9 @@ final class Dereferencer implements DereferencerInterface
      *
      * @return object
      */
-    private function loadExternalRef($reference)
+    private function loadRef($reference)
     {
-        list($prefix, $path) = parse_external_ref($reference);
-        return $this->loaderManager->getLoader($prefix)->load($path);
+        list($protocol, $uri) = parse_ref($reference);
+        return $this->loaderManager->getLoader($protocol)->load($uri);
     }
 }

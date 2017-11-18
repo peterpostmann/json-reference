@@ -13,11 +13,11 @@ class CachedLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $cache  = new ArrayCachePool();
         $cache  = new SimpleCacheBridge($cache);
-        $path   = 'file://schema';
+        $uri   = 'file://schema';
         $schema = json_decode('{"hello": "world"}');
-        $loader = new CachedLoader($cache, new \League\JsonReference\Loader\ArrayLoader([$path => $schema]));
-        $loader->load($path);
-        $this->assertSame($schema, $cache->get(sha1($path)));
+        $loader = new CachedLoader($cache, new \League\JsonReference\Loader\ArrayLoader([$uri => $schema]));
+        $loader->load($uri);
+        $this->assertSame($schema, $cache->get(sha1($uri)));
     }
 
     function test_it_uses_the_cached_schema()
@@ -25,8 +25,8 @@ class CachedLoaderTest extends \PHPUnit_Framework_TestCase
         $cache  = new ArrayCachePool();
         $cache  = new SimpleCacheBridge($cache);
         $loader = new CachedLoader($cache, new ArrayLoader([]));
-        $cache->set(sha1($path = 'file://schema'), $schema = json_decode('{"hello": "world"}'));
-        $result = $loader->load($path);
+        $cache->set(sha1($uri = 'file://schema'), $schema = json_decode('{"hello": "world"}'));
+        $result = $loader->load($uri);
         $this->assertSame($schema, $result);
     }
 }

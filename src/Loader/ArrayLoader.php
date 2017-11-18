@@ -39,20 +39,20 @@ final class ArrayLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function load($path, $extension = 'json')
+    public function load($uri, $extension = 'json')
     {
-        if (!array_key_exists($path, $this->schemas)) {
-            throw SchemaLoadingException::notFound($path);
+        if (!array_key_exists($uri, $this->schemas)) {
+            throw SchemaLoadingException::notFound($uri);
         }
 
-        $schema = $this->schemas[$path];
+        $schema = $this->schemas[$uri];
 
         if (is_string($schema)) {
-            return $this->schemas[$path] = $this->decoders->getDecoder($extension)->decode($schema);
+            return $this->schemas[$uri] = $this->decoders->getDecoder($extension)->decode($schema);
         } elseif (is_object($schema)) {
             return $schema;
         } else {
-            throw SchemaLoadingException::create($path);
+            throw SchemaLoadingException::create($uri);
         }
     }
 }

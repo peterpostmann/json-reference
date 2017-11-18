@@ -10,11 +10,6 @@ use League\JsonReference\LoaderInterface;
 final class CurlWebLoader implements LoaderInterface
 {
     /**
-     * @var string
-     */
-    private $prefix;
-
-    /**
      * @var array
      */
     private $curlOptions;
@@ -25,13 +20,11 @@ final class CurlWebLoader implements LoaderInterface
     private $decoders;
 
     /**
-     * @param string                              $prefix
      * @param array                               $curlOptions
      * @param JsonDecoderInterface|DecoderManager $decoders
      */
-    public function __construct($prefix, array $curlOptions = null, $decoders = null)
+    public function __construct(array $curlOptions = null, $decoders = null)
     {
-        $this->prefix = $prefix;
         $this->setCurlOptions($curlOptions);
         
         if ($decoders instanceof DecoderInterface) {
@@ -44,11 +37,9 @@ final class CurlWebLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function load($path, $defaultExtension = 'json')
+    public function load($uri, $defaultExtension = 'json')
     {
-        $uri = $this->prefix . $path;
-        
-        $extension = isset(pathinfo($path)['extension']) ? pathinfo($path)['extension'] : $defaultExtension;
+        $extension = isset(pathinfo($uri)['extension']) ? pathinfo($uri)['extension'] : $defaultExtension;
         
         $ch = curl_init($uri);
         curl_setopt_array($ch, $this->curlOptions);

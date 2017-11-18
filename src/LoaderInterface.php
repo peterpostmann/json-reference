@@ -7,10 +7,10 @@ interface LoaderInterface
     /**
      * Load the json schema from the given path.
      *
-     * @param string $path The path to load, without the protocol.
+     * @param string $uri The URI to load
      *
      * @return object The object resulting from a json_decode of the loaded path.
      * @throws \League\JsonReference\SchemaLoadingException
      */
-    public function load($path);
+    public function load($uri);
 }

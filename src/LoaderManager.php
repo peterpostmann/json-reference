@@ -4,8 +4,7 @@ namespace League\JsonReference;
 
 use League\JsonReference\DecoderManager;
 use League\JsonReference\Loader\CurlWebLoader;
-use League\JsonReference\Loader\FileGetContentsWebLoader;
-use League\JsonReference\Loader\FileLoader;
+use League\JsonReference\Loader\FileGetContentsLoader;
 
 final class LoaderManager
 {
@@ -25,32 +24,31 @@ final class LoaderManager
     public function __construct(array $loaders = [], DecoderManager $decoderManager = null)
     {
         if (empty($loaders)) {
-            $this->registerDefaultFileLoader();
-            $this->registerDefaultWebLoaders();
+            $this->registerDefaultLoader();
         }
         
         if (empty($decoderManager)) {
             $this->decoderManager = new DecoderManager();
         }
 
-        foreach ($loaders as $prefix => $loader) {
-            $this->registerLoader($prefix, $loader);
+        foreach ($loaders as $protocol => $loader) {
+            $this->registerLoader($protocol, $loader);
         }
     }
 
     /**
-     * Register a LoaderInterface for the given prefix.
+     * Register a LoaderInterface for the given protocol.
      *
-     * @param string          $prefix
+     * @param string          $protocol
      * @param LoaderInterface $loader
      */
-    public function registerLoader($prefix, LoaderInterface $loader)
+    public function registerLoader($protocol, LoaderInterface $loader)
     {
-        $this->loaders[$prefix] = $loader;
+        $this->loaders[$protocol] = $loader;
     }
 
     /**
-     * Get all registered loaders, keyed by the prefix they are registered to load schemas for.
+     * Get all registered loaders, keyed by the protocol they are registered to load schemas for.
      *
      * @return LoaderInterface[]
      */
@@ -60,55 +58,52 @@ final class LoaderManager
     }
 
     /**
-     * Get the loader for the given prefix.
+     * Get the loader for the given protocol.
      *
-     * @param string $prefix
+     * @param string $protocol
      *
      * @return LoaderInterface
      * @throws \InvalidArgumentException
      */
-    public function getLoader($prefix)
+    public function getLoader($protocol)
     {
-        if (!$this->hasLoader($prefix)) {
-            throw new \InvalidArgumentException(sprintf('A loader is not registered for the prefix "%s"', $prefix));
+        if (!$this->hasLoader($protocol)) {
+            throw new \InvalidArgumentException(sprintf('A loader is not registered for the protocol "%s"', $protocol));
         }
 
-        return $this->loaders[$prefix];
+        return $this->loaders[$protocol];
     }
 
     /**
-     * @param string $prefix
+     * @param string $protocol
      *
      * @return bool
      */
-    public function hasLoader($prefix)
+    public function hasLoader($protocol)
     {
-        return isset($this->loaders[$prefix]);
+        return isset($this->loaders[$protocol]);
     }
 
     /**
-     * Register the default file loader.
+     * Register the default loader.
      */
-    private function registerDefaultFileLoader()
+    private function registerDefaultLoader()
     {
-        $this->loaders['file'] = new FileLoader();
-    }
-    
-    /**
-     * Register the default web loaders.  If the curl extension is loaded,
-     * the CurlWebLoader will be used.  Otherwise the FileGetContentsWebLoader
-     * will be used.  You can override this by registering your own loader
-     * for the 'http' and 'https' protocols.
-     */
-    private function registerDefaultWebLoaders()
-    {
-        if (function_exists('curl_init')) {
-            $this->loaders['https'] = new CurlWebLoader('https://');
-            $this->loaders['http']  = new CurlWebLoader('http://');
-        } else {
-            $this->loaders['https'] = new FileGetContentsWebLoader('https://');
-            $this->loaders['http']  = new FileGetContentsWebLoader('http://');
-        }
+        $fileLoader = new FileGetContentsLoader();
+        $webLoader  = function_exists('curl_init') ? new CurlWebLoader() : $fileLoader;
+
+        // file uri
+        $this->loaders['file']  = $fileLoader;
+        
+        // windows path
+        $this->loaders[true]    = $fileLoader;
+
+        // relative path
+        $this->loaders[false]   = $fileLoader;
+
+        // http, https
+        $this->loaders['http']  = $webLoader;
+        $this->loaders['https'] = $webLoader;
     }
 
     /**
