@@ -5,7 +5,7 @@ namespace League\JsonReference\Decoder;
 use League\JsonReference\DecoderInterface;
 use League\JsonReference\DecodingException;
 
-final class JsonDecoder implements DecoderInterface
+class JsonDecoder implements DecoderInterface
 {
     /**
      * @var bool

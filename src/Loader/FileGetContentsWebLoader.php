@@ -15,13 +15,13 @@ final class FileGetContentsWebLoader implements LoaderInterface
     private $prefix;
 
     /**
-     * @var JsonDecoderInterface
+     * @var DecoderInterface
      */
     private $jsonDecoder;
 
     /**
      * @param string               $prefix
-     * @param JsonDecoderInterface $jsonDecoder
+     * @param DecoderInterface $jsonDecoder
      */
     public function __construct($prefix, DecoderManager $decoders = null)
     {
