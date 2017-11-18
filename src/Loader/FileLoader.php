@@ -31,15 +31,10 @@ final class FileLoader implements LoaderInterface
      */
     public function load($path, $defaultExtension = 'json')
     {
-        $path = 'file://'.$path;
-        
-        // Replace blackslashes
-        $path = str_replace('\\', '/', $path);
-            
-        // Fix Windows Path (file://C:/abc --> file:///C:/abc)
-        $path = preg_replace("/^(file:\/\/)(\w:)/", "$1/$2", $path);
-        
         $extension = isset(pathinfo($path)['extension']) ? pathinfo($path)['extension'] : $defaultExtension;
+        
+        // file:// + path without query
+        $path = 'file://'.explode('?', $path, 2)[0];
 
         if (!file_exists($path)) {
             throw SchemaLoadingException::notFound($path);
